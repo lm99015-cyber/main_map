@@ -3,124 +3,164 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>원소 탐험대</title>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Noto+Sans+KR:wght@700;800;900&display=swap" rel="stylesheet">
+<title>원소 탐험 지도</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{width:100%;min-height:100%;background:#1a3a5c;font-family:'Noto Sans KR',sans-serif;overflow-x:hidden;}
-.page{display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:28px 16px 36px;}
-.title-wrap{text-align:center;margin-bottom:20px;}
-.title-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(245,200,66,0.15);border:1.5px solid rgba(245,200,66,0.4);color:#f5c842;font-size:10px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;padding:5px 18px;border-radius:30px;margin-bottom:12px;}
-.title-main{font-family:'Baloo 2',cursive;font-size:clamp(32px,6vw,60px);font-weight:800;color:#f5ead0;line-height:1.1;text-shadow:0 2px 20px rgba(0,0,0,0.6);}
-.title-main em{color:#f5c842;font-style:normal;}
-.title-sub{font-size:13px;color:rgba(245,234,208,0.55);font-weight:700;margin-top:6px;letter-spacing:0.5px;}
-.map-container{position:relative;width:100%;max-width:1000px;}
-.imgmap-wrap{position:relative;width:100%;padding-top:56.14%;}
-.imgmap-wrap img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:20px;box-shadow:0 16px 60px rgba(0,0,0,0.7),0 0 0 3px rgba(245,200,66,0.3);display:block;}
-.map-overlay{position:absolute;top:0;left:0;width:100%;height:100%;border-radius:20px;overflow:hidden;}
-.zone-area{position:absolute;cursor:pointer;transition:all 0.2s;text-decoration:none;}
-.zone-area:hover .zone-glow{opacity:1;}
-.zone-area:hover .zone-label{opacity:1;}
-.zone-glow{position:absolute;inset:0;border-radius:inherit;opacity:0;transition:opacity 0.2s;pointer-events:none;}
-.zone-label{
-  position:absolute;
-  left:50%;top:58%;
-  transform:translate(-50%,-50%);
-  white-space:nowrap;
-  background:rgba(10,20,10,0.92);
-  border:1.5px solid rgba(245,200,66,0.5);
-  border-radius:12px;
-  padding:8px 16px;
-  font-size:13px;font-weight:800;
-  color:#f5ead0;
-  opacity:0;
-  transition:opacity 0.2s;
-  pointer-events:none;
-  backdrop-filter:blur(8px);
-  box-shadow:0 4px 20px rgba(0,0,0,0.5);
-  z-index:200;
-}
-.zone-label::after{display:none;}
-.lbl-icon{font-size:18px;margin-right:6px;}
-.lbl-name{display:block;font-size:14px;font-weight:800;color:#f5c842;}
-.lbl-desc{display:block;font-size:11px;color:rgba(245,234,208,0.6);margin-top:2px;font-weight:700;}
-.zone-1{left:3.6%;top:5.5%;width:40%;height:50%;border-radius:40% 50% 45% 40%;}
-.zone-1 .zone-glow{background:radial-gradient(ellipse at center,rgba(245,200,66,0.25) 0%,transparent 70%);}
-.zone-2{left:58.3%;top:5.5%;width:40%;height:50%;border-radius:50% 40% 40% 45%;}
-.zone-2 .zone-glow{background:radial-gradient(ellipse at center,rgba(255,100,60,0.25) 0%,transparent 70%);}
-.zone-3{left:3.6%;top:48%;width:40%;height:50%;border-radius:45% 40% 50% 40%;}
-.zone-3 .zone-glow{background:radial-gradient(ellipse at center,rgba(60,150,255,0.25) 0%,transparent 70%);}
-.zone-4{left:58.3%;top:48%;width:40%;height:50%;border-radius:40% 45% 40% 50%;}
-.zone-4 .zone-glow{background:radial-gradient(ellipse at center,rgba(60,200,120,0.25) 0%,transparent 70%);}
-.zone-tabs{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:20px;max-width:1000px;width:100%;}
-.zone-tab{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.12);border-radius:14px;padding:10px 18px;text-decoration:none;transition:all 0.15s;flex:1;min-width:180px;}
-.zone-tab:hover{background:rgba(255,255,255,0.12);border-color:rgba(245,200,66,0.4);transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,0.3);}
-.tab-icon{font-size:24px;}
-.tab-num{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:rgba(245,200,66,0.7);display:block;}
-.tab-name{font-size:13px;font-weight:800;color:#f5ead0;display:block;}
-.particle{position:fixed;pointer-events:none;z-index:999;border-radius:50%;animation:burst 0.8s ease-out forwards;}
-@keyframes burst{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0}}
-.island-title{
-  position:absolute;
-  top:58%;left:50%;
-  transform:translate(-50%,-50%);
-  background:rgba(10,20,10,0.45);
-  border:1.5px solid rgba(245,200,66,0.35);
-  border-radius:20px;
-  padding:5px 16px;
-  font-family:'Noto Sans KR',sans-serif;
-  font-size:clamp(10px,1.3vw,13px);
-  font-weight:800;
-  color:#f5c842;
-  white-space:nowrap;
-  pointer-events:none;
-  backdrop-filter:blur(4px);
-  box-shadow:0 3px 14px rgba(0,0,0,0.3);
-  text-shadow:0 1px 6px rgba(0,0,0,0.8);
-  letter-spacing:0.5px;
-  z-index:2;
-}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Noto Sans KR',sans-serif;}
+.wrap{position:relative;width:100%;height:100%;}
+img{display:block;width:100%;height:100%;object-fit:contain;}
 
+/* zone: JS로 position 설정 */
+.zone-area{
+  position:absolute;
+  cursor:pointer;
+  text-decoration:none;
+  border-radius:16px;
+  /* 디버그용 border (확인 후 제거 가능) */
+  /* border:2px dashed red; */
+}
+.zone-area:hover .zone-glow{opacity:1;}
+.zone-glow{
+  position:absolute;inset:0;border-radius:16px;
+  opacity:0;transition:opacity 0.2s;pointer-events:none;
+}
+.zone-1 .zone-glow{background:radial-gradient(ellipse at center,rgba(245,200,66,0.45) 0%,transparent 70%);}
+.zone-2 .zone-glow{background:radial-gradient(ellipse at center,rgba(255,100,60,0.45) 0%,transparent 70%);}
+.zone-3 .zone-glow{background:radial-gradient(ellipse at center,rgba(60,150,255,0.45) 0%,transparent 70%);}
+.zone-4 .zone-glow{background:radial-gradient(ellipse at center,rgba(60,200,120,0.45) 0%,transparent 70%);}
+
+/* 커서 따라다니는 라벨 */
+.zone-label{
+  position:fixed;
+  white-space:nowrap;
+  background:rgba(5,10,5,0.96);
+  border:2.5px solid #f5c842;
+  border-radius:14px;
+  padding:12px 22px;
+  font-size:15px;font-weight:800;
+  color:#fff;
+  opacity:0;
+  transition:opacity 0.25s;
+  pointer-events:none;
+  backdrop-filter:blur(12px);
+  box-shadow:0 6px 32px rgba(0,0,0,0.7),0 0 20px rgba(245,200,66,0.4);
+  z-index:9999;
+}
+.zone-area:hover .zone-label{opacity:1;}
+.lbl-icon{font-size:24px;margin-right:8px;vertical-align:middle;}
+.lbl-name{display:block;font-size:18px;font-weight:900;color:#f5c842;margin-bottom:4px;}
+.lbl-desc{display:block;font-size:13px;color:rgba(245,234,208,0.85);font-weight:700;}
+
+.particle{position:fixed;pointer-events:none;z-index:9999;border-radius:50%;animation:burst 0.8s ease-out forwards;}
+@keyframes burst{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0}}
 </style>
 </head>
 <body>
-<div class="page">
-  <div class="title-wrap">
-    <div class="title-badge">⚗️ Element Explorer</div>
-    <div class="title-main">원소 <em>탐험 지도</em></div>
-    <div class="title-sub">섬을 클릭해서 탐험을 시작하세요!</div>
-  </div>
-  <div class="map-container">
-    <div class="imgmap-wrap">
-      <img src="https://raw.githubusercontent.com/lm99015-cyber/main_map/main/main_map.png" alt="원소 탐험대 지도" draggable="false">
-      <div class="map-overlay">
-        <a class="zone-area zone-1" href="https://lm99015-cyber.github.io/periodic_table1/" target="_blank" onclick="onClick(event,this)">
-          <div class="zone-glow"></div>
-          <div class="zone-label"><span class="lbl-icon">🗺️</span><span class="lbl-name">주기율표 탐험</span><span class="lbl-desc">원소들의 세계를 한눈에!</span></div>
-          <div class="island-title">주기율표 탐험</div>
-        </a>
-        <a class="zone-area zone-2" href="https://lm99015-cyber.github.io/Molar_Mass/" target="_blank" onclick="onClick(event,this)">
-          <div class="zone-glow"></div>
-          <div class="zone-label"><span class="lbl-icon">🧪</span><span class="lbl-name">화학식 탐험</span><span class="lbl-desc">화합식의 비밀을 풀어라!</span></div>
-          <div class="island-title">화학식 탐험</div>
-        </a>
-        <a class="zone-area zone-3" href="https://notebooklm.google.com/notebook/1cd16fdd-9c71-4347-a87f-17ceac3267f7/preview" target="_blank" onclick="onClick(event,this)">
-          <div class="zone-glow"></div>
-          <div class="zone-label"><span class="lbl-icon">🤖</span><span class="lbl-name">AI와 함께 원소 탐험!</span><span class="lbl-desc">구글 계정 로그인 필요!</span></div>
-          <div class="island-title">AI와 함께 원소 탐험!</div>
-        </a>
-        <a class="zone-area zone-4" href="https://lm99015-cyber.github.io/game_level/" target="_blank" onclick="onClick(event,this)">
-          <div class="zone-glow"></div>
-          <div class="zone-label"><span class="lbl-icon">🎮</span><span class="lbl-name">원소 게임 탐험</span><span class="lbl-desc">게임으로 원소를 정복하라!</span></div>
-          <div class="island-title">원소 게임 탐험</div>
-        </a>
-      </div>
-    </div>
-  </div>
+<div class="wrap" id="wrap">
+  <img src="https://lm99015-cyber.github.io/main_map/main_image.png" id="mapImg" alt="원소 탐험 지도" draggable="false">
+
+  <a class="zone-area zone-1" id="zone1" href="https://lm99015-cyber.github.io/periodic_table1/" onclick="spawnConfetti(event)">
+    <div class="zone-glow"></div>
+    <div class="zone-label"><span class="lbl-icon">🗺️</span><span class="lbl-name">원소 탐험</span><span class="lbl-desc">주기율표를 탐험하고 원소의 특징을 알아봐요!</span></div>
+  </a>
+  <a class="zone-area zone-2" id="zone2" href="https://lm99015-cyber.github.io/Molar_Mass/" onclick="spawnConfetti(event)">
+    <div class="zone-glow"></div>
+    <div class="zone-label"><span class="lbl-icon">🧪</span><span class="lbl-name">화학식 탐험</span><span class="lbl-desc">화학식 조합부터 몰량 계산까지!</span></div>
+  </a>
+  <a class="zone-area zone-3" id="zone3" href="https://notebooklm.google.com/notebook/1cd16fdd-9c71-4347-a87f-17ceac3267f7/preview" onclick="spawnConfetti(event)">
+    <div class="zone-glow"></div>
+    <div class="zone-label"><span class="lbl-icon">🤖</span><span class="lbl-name">AI 원소 연구소</span><span class="lbl-desc">AI와 함께 궁금한 것을 연구해요!</span></div>
+  </a>
+  <a class="zone-area zone-4" id="zone4" href="https://lm99015-cyber.github.io/game_level/" onclick="spawnConfetti(event)">
+    <div class="zone-glow"></div>
+    <div class="zone-label"><span class="lbl-icon">🎮</span><span class="lbl-name">원소 게임존</span><span class="lbl-desc">게임으로 원소를 정복하라!</span></div>
+  </a>
 </div>
+
 <script>
-function onClick(e,el){const r=el.getBoundingClientRect();spawnConfetti(r.left+r.width/2,r.top+r.height/2);}
-function spawnConfetti(x,y){const cols=["#f5c842","#22a86a","#3b82f6","#e8421a","#ffffff","#a0d060"];for(let i=0;i<18;i++){const p=document.createElement("div");p.className="particle";const sz=4+Math.random()*8,ang=(Math.PI*2/18)*i,dist=60+Math.random()*80;p.style.cssText=`left:${x}px;top:${y}px;width:${sz}px;height:${sz}px;background:${cols[i%cols.length]};--tx:${Math.cos(ang)*dist}px;--ty:${Math.sin(ang)*dist}px;animation-duration:${0.5+Math.random()*0.4}s;`;document.body.appendChild(p);setTimeout(()=>p.remove(),900);}}
+// 이미지 기준 % 좌표 (좌상단x, 좌상단y, 우하단x, 우하단y)
+const ZONES = [
+  { id:'zone1', x1:3.5,  y1:60.7, x2:24.3, y2:84.0 },
+  { id:'zone2', x1:30.5, y1:60.2, x2:49.1, y2:82.9 },
+  { id:'zone3', x1:54.7, y1:61.7, x2:70.8, y2:84.1 },
+  { id:'zone4', x1:75.7, y1:61.1, x2:95.3, y2:85.5 },
+];
+
+function getImageRect() {
+  const img = document.getElementById('mapImg');
+  const iw = img.naturalWidth  || 1920;
+  const ih = img.naturalHeight || 1080;
+  const sw = window.innerWidth;
+  const sh = window.innerHeight;
+  const imgRatio    = iw / ih;
+  const screenRatio = sw / sh;
+  let rw, rh, ox, oy;
+  if (imgRatio > screenRatio) {
+    rw = sw; rh = sw / imgRatio;
+    ox = 0;  oy = (sh - rh) / 2;
+  } else {
+    rh = sh; rw = sh * imgRatio;
+    ox = (sw - rw) / 2; oy = 0;
+  }
+  return { ox, oy, rw, rh };
+}
+
+function positionZones() {
+  const { ox, oy, rw, rh } = getImageRect();
+  ZONES.forEach(z => {
+    const el = document.getElementById(z.id);
+    if (!el) return;
+    const left   = ox + rw * z.x1 / 100;
+    const top    = oy + rh * z.y1 / 100;
+    const width  = rw * (z.x2 - z.x1) / 100;
+    const height = rh * (z.y2 - z.y1) / 100;
+    el.style.left   = left   + 'px';
+    el.style.top    = top    + 'px';
+    el.style.width  = width  + 'px';
+    el.style.height = height + 'px';
+  });
+}
+
+// 이미지 로드 후 + 리사이즈 시 좌표 재계산
+const img = document.getElementById('mapImg');
+img.addEventListener('load', positionZones);
+if (img.complete) positionZones();
+window.addEventListener('resize', positionZones);
+
+// 커서 따라다니는 라벨
+let activeLabel = null;
+document.querySelectorAll('.zone-area').forEach(zone => {
+  const label = zone.querySelector('.zone-label');
+  zone.addEventListener('mouseenter', () => { activeLabel = label; });
+  zone.addEventListener('mouseleave', () => { activeLabel = null; });
+});
+document.addEventListener('mousemove', e => {
+  if (!activeLabel) return;
+  const lw = activeLabel.offsetWidth || 220;
+  const lh = activeLabel.offsetHeight || 80;
+  let x = e.clientX + 20;
+  let y = e.clientY - lh / 2;
+  if (x + lw > window.innerWidth  - 10) x = e.clientX - lw - 20;
+  if (y < 10) y = 10;
+  if (y + lh > window.innerHeight - 10) y = window.innerHeight - lh - 10;
+  activeLabel.style.left = x + 'px';
+  activeLabel.style.top  = y + 'px';
+});
+
+// 파티클
+function spawnConfetti(e) {
+  const x = e.clientX, y = e.clientY;
+  const cols = ["#f5c842","#22a86a","#3b82f6","#e8421a","#ffffff","#a0d060"];
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement("div");
+    p.className = "particle";
+    const sz = 4 + Math.random()*8, ang = (Math.PI*2/18)*i, dist = 60 + Math.random()*80;
+    p.style.cssText = `left:${x}px;top:${y}px;width:${sz}px;height:${sz}px;background:${cols[i%cols.length]};--tx:${Math.cos(ang)*dist}px;--ty:${Math.sin(ang)*dist}px;animation-duration:${0.5+Math.random()*0.4}s;`;
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 900);
+  }
+}
 </script>
 </body>
 </html>
