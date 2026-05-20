@@ -25,10 +25,10 @@ img{display:block;width:100%;height:100%;object-fit:contain;}
   position:absolute;inset:0;border-radius:16px;
   opacity:0;transition:opacity 0.2s;pointer-events:none;
 }
-.zone-1 .zone-glow{background:radial-gradient(ellipse at center,rgba(245,200,66,0.45) 0%,transparent 70%);}
-.zone-2 .zone-glow{background:radial-gradient(ellipse at center,rgba(255,100,60,0.45) 0%,transparent 70%);}
-.zone-3 .zone-glow{background:radial-gradient(ellipse at center,rgba(60,150,255,0.45) 0%,transparent 70%);}
-.zone-4 .zone-glow{background:radial-gradient(ellipse at center,rgba(60,200,120,0.45) 0%,transparent 70%);}
+.zone-1 .zone-glow{background:radial-gradient(ellipse at center,rgba(60,200,120,0.75) 0%,transparent 60%);}
+.zone-2 .zone-glow{background:radial-gradient(ellipse at center,rgba(255,100,60,0.75) 0%,transparent 60%);}
+.zone-3 .zone-glow{background:radial-gradient(ellipse at center,rgba(60,150,255,0.75) 0%,transparent 60%);}
+.zone-4 .zone-glow{background:radial-gradient(ellipse at center,rgba(245,200,66,0.75) 0%,transparent 60%);}
 
 /* 커서 따라다니는 라벨 */
 .zone-label{
@@ -132,20 +132,38 @@ window.addEventListener('resize', positionZones);
 let activeLabel = null;
 document.querySelectorAll('.zone-area').forEach(zone => {
   const label = zone.querySelector('.zone-label');
-  zone.addEventListener('mouseenter', () => { activeLabel = label; });
-  zone.addEventListener('mouseleave', () => { activeLabel = null; });
+  const glow  = zone.querySelector('.zone-glow');
+  zone.addEventListener('mouseenter', () => {
+    activeLabel = label;
+    if(label) label.style.opacity = '1';
+    if(glow)  glow.style.opacity  = '1';
+  });
+  zone.addEventListener('mouseleave', () => {
+    activeLabel = null;
+    if(label) label.style.opacity = '0';
+    if(glow)  glow.style.opacity  = '0';
+  });
 });
 document.addEventListener('mousemove', e => {
   if (!activeLabel) return;
   const lw = activeLabel.offsetWidth || 220;
   const lh = activeLabel.offsetHeight || 80;
-  let x = e.clientX + 20;
+  // zone4 라벨은 항상 커서 왼쪽
+  const forceLeft = activeLabel.closest('#zone4') !== null;
+  let x = forceLeft ? e.clientX - lw - 20 : e.clientX + 20;
   let y = e.clientY - lh / 2;
-  if (x + lw > window.innerWidth  - 10) x = e.clientX - lw - 20;
+  if (!forceLeft && x + lw > window.innerWidth  - 10) x = e.clientX - lw - 20;
   if (y < 10) y = 10;
   if (y + lh > window.innerHeight - 10) y = window.innerHeight - lh - 10;
   activeLabel.style.left = x + 'px';
   activeLabel.style.top  = y + 'px';
+});
+
+// 뒤로가기로 돌아올 때 hover 상태 초기화
+window.addEventListener('pageshow', () => {
+  activeLabel = null;
+  document.querySelectorAll('.zone-glow').forEach(g => g.style.opacity = '0');
+  document.querySelectorAll('.zone-label').forEach(l => l.style.opacity = '0');
 });
 
 // 파티클
