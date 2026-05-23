@@ -4,33 +4,50 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>원소 탐험 지도</title>
+
+<!-- 한국어 글씨체 불러오기 기능. -->
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@700;800;900&display=swap" rel="stylesheet">
+
 <style>
+/* 브라우저 기본 여백 초기화 기능. */
 *{box-sizing:border-box;margin:0;padding:0}
+
+/* 지도 이미지 전체 화면 표시 기능. */
 html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Noto Sans KR',sans-serif;}
+
+/* 클릭 구역 위치 기준 틀 기능. */
 .wrap{position:relative;width:100%;height:100%;}
+
+/* 지도 이미지 비율 유지 표시 기능. */
 img{display:block;width:100%;height:100%;object-fit:contain;}
 
-/* zone: JS로 position 설정 */
+/* 클릭 구역 공통 스타일 기능. */
 .zone-area{
   position:absolute;
   cursor:pointer;
   text-decoration:none;
   border-radius:16px;
-  /* 디버그용 border (확인 후 제거 가능) */
-  /* border:2px dashed red; */
 }
+
+/* 마우스 오버 시 빛 효과 표시 기능. */
 .zone-area:hover .zone-glow{opacity:1;}
+
+/* 구역별 빛 효과 레이어 기능. */
 .zone-glow{
   position:absolute;inset:0;border-radius:16px;
   opacity:0;transition:opacity 0.2s;pointer-events:none;
 }
+
+/* 구역별 빛 색상 적용 기능. (1:초록 / 2:주황 / 3:파랑 / 4:노랑) */
 .zone-1 .zone-glow{background:radial-gradient(ellipse at center,rgba(60,200,120,0.75) 0%,transparent 60%);}
 .zone-2 .zone-glow{background:radial-gradient(ellipse at center,rgba(255,100,60,0.75) 0%,transparent 60%);}
 .zone-3 .zone-glow{background:radial-gradient(ellipse at center,rgba(60,150,255,0.75) 0%,transparent 60%);}
 .zone-4 .zone-glow{background:radial-gradient(ellipse at center,rgba(245,200,66,0.75) 0%,transparent 60%);}
 
-/* 커서 따라다니는 라벨 */
+/* 마우스 오버 시 설명 카드 표시 기능. */
+.zone-area:hover .zone-label{opacity:1;}
+
+/* 커서 추적 설명 카드 디자인 기능. */
 .zone-label{
   position:fixed;
   white-space:nowrap;
@@ -47,31 +64,44 @@ img{display:block;width:100%;height:100%;object-fit:contain;}
   box-shadow:0 6px 32px rgba(0,0,0,0.7),0 0 20px rgba(245,200,66,0.4);
   z-index:9999;
 }
-.zone-area:hover .zone-label{opacity:1;}
+
+/* 설명 카드 내부 이모지·제목·설명 글씨 스타일 기능. */
 .lbl-icon{font-size:24px;margin-right:8px;vertical-align:middle;}
 .lbl-name{display:block;font-size:18px;font-weight:900;color:#f5c842;margin-bottom:4px;}
 .lbl-desc{display:block;font-size:13px;color:rgba(245,234,208,0.85);font-weight:700;}
 
+/* 클릭 시 색종이 터짐 효과 기능. */
 .particle{position:fixed;pointer-events:none;z-index:9999;border-radius:50%;animation:burst 0.8s ease-out forwards;}
 @keyframes burst{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0}}
 </style>
 </head>
 <body>
+
+<!-- 전체 화면 레이아웃 틀 기능. -->
 <div class="wrap" id="wrap">
+
+  <!-- 배경 지도 이미지 표시 기능. -->
   <img src="https://lm99015-cyber.github.io/main_map/main_image.png" id="mapImg" alt="원소 탐험 지도" draggable="false">
 
+  <!-- 1번 구역: 주기율표 탐색 페이지 이동 기능. -->
   <a class="zone-area zone-1" id="zone1" href="https://lm99015-cyber.github.io/periodic_table1/" onclick="spawnConfetti(event)">
     <div class="zone-glow"></div>
     <div class="zone-label"><span class="lbl-icon">🗺️</span><span class="lbl-name">원소 탐험</span><span class="lbl-desc">주기율표를 탐험하고<br>원소의 특징을 알아봐요!</span></div>
   </a>
+
+  <!-- 2번 구역: 화학식·몰량 계산 페이지 이동 기능. -->
   <a class="zone-area zone-2" id="zone2" href="https://lm99015-cyber.github.io/Molar_Mass/" onclick="spawnConfetti(event)">
     <div class="zone-glow"></div>
     <div class="zone-label"><span class="lbl-icon">🧪</span><span class="lbl-name">화학식 탐험</span><span class="lbl-desc">화학식 조합부터 몰량 계산까지!</span></div>
   </a>
+
+  <!-- 3번 구역: AI 학습 도우미 페이지 이동 기능. (구글 로그인 필요) -->
   <a class="zone-area zone-3" id="zone3" href="https://notebooklm.google.com/notebook/1cd16fdd-9c71-4347-a87f-17ceac3267f7/preview" onclick="spawnConfetti(event)">
     <div class="zone-glow"></div>
     <div class="zone-label"><span class="lbl-icon">🤖</span><span class="lbl-name">AI 원소 연구소</span><span class="lbl-desc">AI와 함께 궁금한 것을 연구해요!<br>🔑 구글 계정 로그인 필요</span></div>
   </a>
+
+  <!-- 4번 구역: 원소 게임 레벨 선택 페이지 이동 기능. -->
   <a class="zone-area zone-4" id="zone4" href="https://lm99015-cyber.github.io/game_level/" onclick="spawnConfetti(event)">
     <div class="zone-glow"></div>
     <div class="zone-label"><span class="lbl-icon">🎮</span><span class="lbl-name">원소 게임존</span><span class="lbl-desc">게임으로 원소를 정복하라!</span></div>
@@ -79,7 +109,8 @@ img{display:block;width:100%;height:100%;object-fit:contain;}
 </div>
 
 <script>
-// 이미지 기준 % 좌표 (좌상단x, 좌상단y, 우하단x, 우하단y)
+/* 구역별 위치 데이터 저장 기능.
+   지도 이미지 기준 % 좌표로 각 구역의 영역을 정의합니다. */
 const ZONES = [
   { id:'zone1', x1:3.5,  y1:60.7, x2:24.3, y2:84.0 },
   { id:'zone2', x1:30.5, y1:60.2, x2:49.1, y2:82.9 },
@@ -87,6 +118,7 @@ const ZONES = [
   { id:'zone4', x1:75.7, y1:61.1, x2:95.3, y2:85.5 },
 ];
 
+/* 화면 크기에 따른 지도 이미지 실제 표시 영역 계산 기능. */
 function getImageRect() {
   const img = document.getElementById('mapImg');
   const iw = img.naturalWidth  || 1920;
@@ -106,6 +138,7 @@ function getImageRect() {
   return { ox, oy, rw, rh };
 }
 
+/* 구역 클릭 영역 위치·크기 자동 적용 기능. */
 function positionZones() {
   const { ox, oy, rw, rh } = getImageRect();
   ZONES.forEach(z => {
@@ -122,13 +155,13 @@ function positionZones() {
   });
 }
 
-// 이미지 로드 후 + 리사이즈 시 좌표 재계산
+/* 페이지 로드·창 크기 변경 시 구역 위치 자동 재계산 기능. */
 const img = document.getElementById('mapImg');
 img.addEventListener('load', positionZones);
 if (img.complete) positionZones();
 window.addEventListener('resize', positionZones);
 
-// 커서 따라다니는 라벨
+/* 마우스 오버 시 설명 카드·빛 효과 표시·숨김 기능. */
 let activeLabel = null;
 document.querySelectorAll('.zone-area').forEach(zone => {
   const label = zone.querySelector('.zone-label');
@@ -144,11 +177,12 @@ document.querySelectorAll('.zone-area').forEach(zone => {
     if(glow)  glow.style.opacity  = '0';
   });
 });
+
+/* 설명 카드 커서 실시간 추적 및 화면 밖 이탈 방지 기능. */
 document.addEventListener('mousemove', e => {
   if (!activeLabel) return;
   const lw = activeLabel.offsetWidth || 220;
   const lh = activeLabel.offsetHeight || 80;
-  // zone4 라벨은 항상 커서 왼쪽
   const forceLeft = activeLabel.closest('#zone4') !== null;
   let x = forceLeft ? e.clientX - lw - 20 : e.clientX + 20;
   let y = e.clientY - lh / 2;
@@ -159,14 +193,14 @@ document.addEventListener('mousemove', e => {
   activeLabel.style.top  = y + 'px';
 });
 
-// 뒤로가기로 돌아올 때 hover 상태 초기화
+/* 뒤로가기 복귀 시 화면 상태 초기화 기능. */
 window.addEventListener('pageshow', () => {
   activeLabel = null;
   document.querySelectorAll('.zone-glow').forEach(g => g.style.opacity = '0');
   document.querySelectorAll('.zone-label').forEach(l => l.style.opacity = '0');
 });
 
-// 파티클
+/* 구역 클릭 시 색종이 터짐 효과 생성 기능. */
 function spawnConfetti(e) {
   const x = e.clientX, y = e.clientY;
   const cols = ["#f5c842","#22a86a","#3b82f6","#e8421a","#ffffff","#a0d060"];
