@@ -78,39 +78,36 @@ img{display:block;width:100%;height:100%;object-fit:contain;}
 .particle{position:fixed;pointer-events:none;z-index:9999;border-radius:50%;animation:burst 0.8s ease-out forwards;}
 @keyframes burst{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0}}
 
-/* 우측 상단 자료실 버튼 디자인 기능. 지도 화면 오른쪽 위에 항상 고정되어 구글 드라이브 자료실로 연결되는 버튼입니다.
-   position:fixed는 화면이 바뀌어도 같은 자리에 머무르게 하고, 지도 위 설명 카드와 같은 검정 배경·금색 테두리로 디자인을 통일했습니다. */
+/* 우측 상단 자료실 버튼(이미지) 디자인 기능. 선생님이 직접 만든 버튼 그림(down.png)을 그대로 버튼으로 사용합니다.
+   실제 위치(left·top)와 크기(width)는 아래 <script>에서 지도 이미지의 오른쪽 위 모서리에 맞춰 자동 계산합니다. top·right 값은 스크립트 실행 전까지 쓰이는 임시 위치입니다. */
 .drive-btn{
   position:fixed;
   top:20px;right:20px;
   z-index:9999;
-  padding:12px 26px;
-  background:rgba(5,10,5,0.96);
-  border:2.5px solid #f5c842;
-  border-radius:30px;
-  font-family:'Noto Sans KR',sans-serif;
-  font-size:16px;font-weight:800;
-  color:#f5c842;
-  text-decoration:none;
-  backdrop-filter:blur(12px);
-  box-shadow:0 6px 24px rgba(0,0,0,0.6),0 0 16px rgba(245,200,66,0.35);
-  transition:transform 0.2s,background 0.2s,color 0.2s,box-shadow 0.2s;
+  display:block;
+  cursor:pointer;
+  filter:drop-shadow(0 6px 16px rgba(0,0,0,0.55));
+  transition:transform 0.2s,filter 0.2s;
 }
 
-/* 자료실 버튼 마우스 오버 효과 기능. 마우스를 올리면 버튼이 살짝 떠오르고 금색으로 채워지며 글씨는 어두워집니다. */
+/* 자료실 버튼 그림 표시 기능. 버튼 칸을 가로로 가득 채우되 세로는 비율대로 자동 조절하여 그림이 찌그러지지 않게 합니다.
+   (위쪽의 공통 img 규칙보다 이 규칙이 우선 적용됩니다.) */
+.drive-btn img{display:block;width:100%;height:auto;}
+
+/* 자료실 버튼 마우스 오버 효과 기능. 마우스를 올리면 버튼이 살짝 떠오르고 커지며 그림자가 진해집니다. */
 .drive-btn:hover{
-  transform:translateY(-2px);
-  background:#f5c842;
-  color:#1a1a1a;
-  box-shadow:0 8px 28px rgba(0,0,0,0.7),0 0 24px rgba(245,200,66,0.6);
+  transform:translateY(-2px) scale(1.04);
+  filter:drop-shadow(0 9px 22px rgba(0,0,0,0.7));
 }
 </style>
 </head>
 <body>
 
 <!-- 우측 상단 자료실 버튼 표시 기능. 누르면 새 탭(target="_blank")으로 원소 탐험대 구글 드라이브 자료실이 열립니다.
-     rel="noopener noreferrer"는 새 탭으로 열 때의 보안을 위한 설정입니다. -->
-<a class="drive-btn" href="https://drive.google.com/drive/folders/1ZRHTjk06uyy15AovOd5ozJICbskLoTYE" target="_blank" rel="noopener noreferrer">자료실</a>
+     버튼 모양은 선생님이 만든 그림(down.png)을 사용하며, rel="noopener noreferrer"는 새 탭으로 열 때의 보안 설정입니다. -->
+<a class="drive-btn" href="https://drive.google.com/drive/folders/1ZRHTjk06uyy15AovOd5ozJICbskLoTYE" target="_blank" rel="noopener noreferrer">
+  <img src="https://lm99015-cyber.github.io/main_map/down.png" alt="자료실" draggable="false">
+</a>
 
 <!-- 전체 화면 레이아웃 틀 기능. -->
 <div class="wrap" id="wrap">
@@ -194,6 +191,19 @@ function positionZones() {
     el.style.width  = width  + 'px';
     el.style.height = height + 'px';
   });
+
+  /* 자료실 버튼을 지도 이미지 오른쪽 위 모서리에 맞추는 기능.
+     화면이 아니라 실제 그림 영역을 기준으로 위치를 잡아, 좌우·상하 검은 여백이 있어도 항상 지도 안쪽 우측 상단에 놓이도록 합니다.
+     버튼 그림 크기(bw)는 그림 너비의 12%로 정하되 90~220px 사이로 제한하고, 여백 m은 그림 너비의 1.5%(최소 16px)로 두어 화면이 커져도 비율이 자연스럽게 유지됩니다. */
+  const driveBtn = document.querySelector('.drive-btn');
+  if (driveBtn) {
+    const m  = Math.max(16, rw * 0.015);
+    const bw = Math.min(220, Math.max(90, rw * 0.12));
+    driveBtn.style.width = bw + 'px';
+    driveBtn.style.right = 'auto';
+    driveBtn.style.left  = (ox + rw - bw - m) + 'px';
+    driveBtn.style.top   = (oy + m) + 'px';
+  }
 }
 
 /* 페이지 로드·창 크기 변경 시 구역 위치 자동 재계산 기능.
